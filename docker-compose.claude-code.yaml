@@ -7,7 +7,7 @@ services:
       #  UID: ${UID-1000}
       #  GID: ${GID-1000}
 
-    # Nur dein Projektordner ist sichtbar
+    # Only your project folder is visible
     volumes:
       - ./:/workspace
       - ./docker-compose.claude-code.yaml:/workspace/docker-compose.claude-code.yaml:rw
@@ -15,16 +15,16 @@ services:
 
     working_dir: /workspace
 
-    # user: "${UID-1000}:${GID-1000}"   # passt Host-Rechte durch
+    # user: "${UID-1000}:${GID-1000}"   # matches host permissions
 
     cap_drop:
-      - ALL                        # alle Kernel-Capabilities droppen
+      - ALL                        # drop all kernel capabilities
     security_opt:
-      - no-new-privileges:true     # keine Eskalation
-      # seccomp: Standardprofil von Docker bleibt aktiv (empfohlen)
-      # AppArmor/SELinux greifen zusätzlich, falls auf dem Host aktiv sind
+      - no-new-privileges:true     # no privilege escalation
+      # seccomp: Docker's default profile remains active (recommended)
+      # AppArmor/SELinux also apply if active on the host
 
-    # Ressourcen-Limits (optional, aber sinnvoll)
+    # Resource limits (optional but recommended)
     deploy:
       resources:
         limits:
@@ -34,9 +34,9 @@ services:
           cpus: '0.5'
           memory: 512m
 
-    # Netzwerk bleibt an (Claude braucht Internet für Auth/API)
-    # Wenn du komplett offline bauen willst, kannst du hier "network_mode: none" setzen,
-    # aber dann funktioniert die CLI nicht.
+    # Network stays on (Claude needs internet for Auth/API)
+    # If you want to build completely offline, you can set "network_mode: none" here,
+    # but then the CLI won't work.
     # network_mode: none
 
     tty: true

@@ -1,0 +1,42 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.claude-code
+      #args:
+      #  UID: ${UID-1000}
+      #  GID: ${GID-1000}
+
+    # Nur dein Projektordner ist sichtbar
+    volumes:
+      - ./:/workspace
+      - ./docker-compose.claude-code.yaml:/workspace/docker-compose.claude-code.yaml:rw
+      - ./init-firewall.sh:/workspace/init-firewall.sh:rw
+
+    working_dir: /workspace
+
+    # user: "${UID-1000}:${GID-1000}"   # passt Host-Rechte durch
+
+    cap_drop:
+      - ALL                        # alle Kernel-Capabilities droppen
+    security_opt:
+      - no-new-privileges:true     # keine Eskalation
+      # seccomp: Standardprofil von Docker bleibt aktiv (empfohlen)
+      # AppArmor/SELinux greifen zusätzlich, falls auf dem Host aktiv sind
+
+    # Ressourcen-Limits (optional, aber sinnvoll)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
+
+    # Netzwerk bleibt an (Claude braucht Internet für Auth/API)
+    # Wenn du komplett offline bauen willst, kannst du hier "network_mode: none" setzen,
+    # aber dann funktioniert die CLI nicht.
+    # network_mode: none
+
+    tty: true

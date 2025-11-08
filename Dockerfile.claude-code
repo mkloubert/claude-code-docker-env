@@ -1,6 +1,6 @@
 # based on https://github.com/anthropics/claude-code/tree/main/.devcontainer
 
-FROM node:20
+FROM node:24
 
 ARG TZ
 ENV TZ="$TZ"

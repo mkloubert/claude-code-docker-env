@@ -38,6 +38,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN ln -s /usr/bin/python3 /usr/local/bin/python && \
     ln -s /usr/bin/pip3 /usr/local/bin/pip
 
+# Install uv (Python tool manager) system-wide
+RUN curl -LsSf https://astral.sh/uv/install.sh \
+    | env UV_INSTALL_DIR=/usr/local/bin INSTALLER_NO_MODIFY_PATH=1 sh
+
+# Ensure /usr/local/bin is in PATH (for all users)
+ENV PATH="/usr/local/bin:${PATH}"
+
 # Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \
   chown -R node:node /usr/local/share
@@ -90,6 +97,12 @@ RUN go version
 
 # Set up non-root user
 USER node
+
+# Make uv available for the node user
+RUN mkdir -p /home/node/.local/bin && \
+    cp /usr/local/bin/uv /home/node/.local/bin/uv && \
+    chown -R node:node /home/node/.local
+ENV PATH="/home/node/.local/bin:${PATH}"
 
 # Install global packages
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
